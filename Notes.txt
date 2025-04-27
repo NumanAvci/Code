@@ -1,0 +1,71 @@
+1. State Compression with Bitmasking:
+Mevcut Durum: Algoritman şu an bitmasking kullanarak her işin tamamlanıp tamamlanmadığını takip ediyor.
+
+Alternatif: Eğer job sayısı çok büyükse, işlerin durumlarını izlemek için state compression (durum sıkıştırma) teknikleri kullanılabilir. Bu, bitmask yerine daha sıkıştırılmış yapıları (örneğin, Fibonacci sıralama, bileşen tabanlı modelleme) kullanmayı içerebilir.
+
+Makale Önerisi:
+
+"Optimal Job Scheduling Using Dynamic Programming and State Compression"
+
+"Efficient Dynamic Programming Approaches for Large-Scale Job Scheduling" (Bu tür yazılar state space'ini küçültmek ve çözüm alanını daraltmak için veri yapılarıyla yapılan optimizasyonları tartışır.)
+
+2. Priority-Based Scheduling with DP:
+Mevcut Durum: Şu anda her job eşit öneme sahip gibi davranılıyor.
+
+Alternatif: Her iş için öncelik (priority) atamak ve bunu sıralama sırasında kullanmak da bir seçenek olabilir. Dinamik programlamada, yüksek öncelikli işlerin daha önce yapılmasını sağlayarak optimal turnaround time elde edebilirsin.
+
+Makale Önerisi:
+
+"Priority-Based Scheduling with Dynamic Programming"
+
+"The Role of Job Prioritization in Scheduling Algorithms" (Bu makaleler, öncelik tabanlı kararlar kullanarak optimizasyon yapmayı tartışır.)
+
+####3. Incremental Time Steps with Lookahead:
+Mevcut Durum: Şu an zaman sadece arrival_time ve completion_time gibi belirli zaman dilimlerinde ilerliyor.
+
+Alternatif: Daha ileriye dönük (lookahead) kararlar vererek, her adımda sadece en yakın seçeneği değil, birkaç adım sonrasındaki durumu da değerlendirebilirsin. Bu, daha karmaşık ama potansiyel olarak daha iyi sonuçlar verir.
+
+Makale Önerisi:
+
+"Lookahead Scheduling Algorithms with Dynamic Programming"
+
+"Forward-Looking Dynamic Programming for Job Scheduling Optimization" (Burada, DP algoritmalarının gelecekteki kararları da göz önüne alarak nasıl daha verimli hale getirildiği ele alınır.)
+
+4. Approximate DP with Pruning:
+Mevcut Durum: Mevcut çözüm her işin bitmesini bekliyor, ve her durum yeniden hesaplanıyor.
+
+Alternatif: DP algoritmalarında, çok büyük durumlar ve alt problemlerin tekrar hesaplanmasından kaçınmak için pruning (budama) tekniklerini kullanabilirsin. Yani, bazı "olumsuz" durumları erken tespit edip bunları hesaplamadan dışlayarak daha hızlı çözüm bulabilirsin.
+
+Makale Önerisi:
+
+"Efficient Approximation in Job Scheduling Problems Using Dynamic Programming"
+
+"Pruning Techniques for Large Scale DP Scheduling Problems" (Burada, gereksiz hesaplamaların nasıl dışlanacağına dair teknikler ele alınır.)
+
+5. Stochastic Scheduling:
+Mevcut Durum: İşlerin varlığı ve süreleri tam belirli.
+
+Alternatif: Eğer işler ve süreler belirsizse (stochastic), DP tekniklerini stokastik modelleme ile entegre edebilirsin. Bu yaklaşımda, işlerin arrival ve burst time'ları rastgele dağılımlar ile modellenir. DP burada beklenen sonuçları hesaplar.
+
+Makale Önerisi:
+
+"Stochastic Dynamic Programming for Job Scheduling"
+
+"Robust Scheduling Algorithms with Stochastic Constraints" (Bu makaleler, DP algoritmalarını belirsiz iş yükü koşulları altında optimize etmeyi tartışır.)
+
+Ekstra Araştırma ve Okuma Önerileri:
+"Introduction to Algorithms" by Cormen, Leiserson, Rivest, and Stein: Bu kitap, dinamik programlama ve iş sıralama algoritmalarını derinlemesine inceler.
+
+"Algorithms on Strings, Trees, and Sequences" by Dan Gusfield: Burada, DP tekniklerinin büyük veri kümelerinde nasıl kullanıldığı üzerine örnekler vardır.
+
+"The Art of Computer Programming" by Donald Knuth: Bu kitapta, DP ve diğer algoritma tekniklerinin temel ilkeleri daha kapsamlı şekilde açıklanmıştır.
+
+IEEE Journals ve ACM Digital Library gibi akademik veri tabanlarında, job scheduling ve dynamic programming üzerine sayısız makale bulunmaktadır. İşte bazı anahtar kelimelerle araştırma yapabilirsin:
+
+"job scheduling dynamic programming"
+
+"optimal scheduling with DP"
+
+"approximate job scheduling algorithms"
+
+"dynamic programming pruning for scheduling"
