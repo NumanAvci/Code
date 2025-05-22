@@ -11,53 +11,14 @@ class Job:
         self.remaining_time = burst_time
         self.start_time = None
         self.completion_time = None
-        self.current_queue = 0#for MLFQ
-        self.vruntime = 0  # CFS-specific
+        self.current_queue = 0
+        self.vruntime = 0
         self.priority = priority
 
     def __repr__(self):
         return f"Job(id={self.id}, arrival={self.arrival_time}, burst={self.burst_time})"
 
-
-def priority_based_dp(jobs):
-    n = len(jobs)
-    
-    # Sort jobs based on priority (higher priority first)
-    jobs.sort(key=lambda x: x.priority, reverse=True)
-    
-    # dp[mask][time] -> minimum turnaround time for a given job set and current time
-    dp = np.inf * np.ones((2**n, n+1))  # (mask, time) -> minimum turnaround time
-    dp[0][0] = 0  # Base case: no jobs scheduled at time 0
-
-    # Iterate over all subsets of jobs (represented as masks)
-    for mask in range(1, 2**n):
-        for time in range(n+1):  # Considering each possible time slot
-            if dp[mask][time] == np.inf:
-                continue
-            
-            # Try to add each job to the current mask
-            for j in range(n):
-                # Check if job j has already been scheduled (in the mask)
-                if (mask & (1 << j)) > 0:
-                    continue
-                
-                # Calculate the new mask after adding job j
-                new_mask = mask | (1 << j)
-                
-                # Calculate the new time after executing job j
-                new_time = max(time, jobs[j].arrival_time) + jobs[j].burst_time
-                
-                # Update dp array with the new turnaround time for the new state
-                dp[new_mask][new_time] = min(dp[new_mask][new_time], dp[mask][time] + jobs[j].burst_time)
-    
-    # Find the minimum turnaround time for all completed jobs
-    min_turnaround_time = np.inf
-    for time in range(n+1):
-        min_turnaround_time = min(min_turnaround_time, dp[(2**n)-1][time])
-    
-    return min_turnaround_time
-
-def dp_scheduler_min_turnaround(jobs):
+def dp_scheduler(jobs, objective='turnaround'):
     n = len(jobs)
     jobs = sorted(jobs, key=lambda job: job.arrival_time)
 
@@ -69,14 +30,12 @@ def dp_scheduler_min_turnaround(jobs):
         min_cost = float('inf')
         best_schedule = []
 
-        # O anki hazır işlerin listesi
         ready_jobs = [
             (i, jobs[i]) for i in range(n)
             if not (completed_mask & (1 << i)) and jobs[i].arrival_time <= time
         ]
 
         if not ready_jobs:
-            # Eğer hazır iş yoksa: zamanı ilerlet ve devam et
             next_arrival = min(
                 jobs[i].arrival_time for i in range(n) if not (completed_mask & (1 << i))
             )
@@ -85,10 +44,18 @@ def dp_scheduler_min_turnaround(jobs):
         for i, job in ready_jobs:
             start_time = max(time, job.arrival_time)
             completion_time = start_time + job.burst_time
-            turnaround_time = completion_time - job.arrival_time
+
+            if objective == 'turnaround':
+                cost = completion_time - job.arrival_time
+            elif objective == 'response':
+                cost = start_time - job.arrival_time
+            elif objective == 'waiting':
+                cost = start_time - job.arrival_time
+            else:
+                raise ValueError("Unknown objective")
 
             next_cost, next_schedule = dp(completion_time, completed_mask | (1 << i))
-            total_cost = turnaround_time + next_cost
+            total_cost = cost + next_cost
 
             if total_cost < min_cost:
                 min_cost = total_cost
@@ -98,41 +65,23 @@ def dp_scheduler_min_turnaround(jobs):
 
     optimal_cost, schedule = dp(0, 0)
 
-    print(f"Optimal Total Turnaround Time = {optimal_cost}")
+    print(f"Optimal Total {objective.capitalize()} Time = {optimal_cost}")
     print("\nOptimal Job Schedule:")
     for job, start, finish in schedule:
         print(f"Job {job.id} : Start at {start}, Finish at {finish}")
+        job.start_time = start
+        job.completion_time = finish
 
-    return schedule
+    return schedule, jobs
 
-
-def plot_gantt(schedule):
+def dp_plot_gantt(schedule):
     fig, ax = plt.subplots(figsize=(12, 3))
-
     colors = {}
     for job, start, finish in schedule:
         if job.id not in colors:
-            colors[job.id] = (random.random(), random.random(), random.random())  # random renk
-
-        ax.barh(
-            y=job.id,
-            width=finish - start,
-            left=start,
-            height=0.5,
-            color=colors[job.id],
-            edgecolor='black'
-        )
-        ax.text(
-            x=start + (finish - start) / 2,
-            y=job.id,
-            s=f"J{job.id}",
-            va='center',
-            ha='center',
-            color='white',
-            fontsize=10,
-            fontweight='bold'
-        )
-
+            colors[job.id] = (random.random(), random.random(), random.random())
+        ax.barh(y=job.id, width=finish - start, left=start, height=0.5, color=colors[job.id], edgecolor='black')
+        ax.text(x=start + (finish - start) / 2, y=job.id, s=f"J{job.id}", va='center', ha='center', color='white')
     ax.set_xlabel('Time')
     ax.set_ylabel('Job ID')
     ax.set_title('Gantt Chart of Scheduled Jobs')
@@ -147,22 +96,26 @@ def generate_random_jobs(n):
         burst_time = random.randint(1, 10)
         job = Job(id=i, arrival_time=arrival_time, burst_time=burst_time, priority=1)
         jobs.append(job)
-    
-    # İstersen sıralı döndür: arrival_time'a göre
     jobs.sort(key=lambda job: job.arrival_time)
     return jobs
-
 
 if __name__ == "__main__":
     random_jobs = generate_random_jobs(5)
     for job in random_jobs:
         print(f"Job {job.id} - Arrival: {job.arrival_time}, Burst: {job.burst_time}")
 
-    print("\n--- DP Optimal Turnaround Scheduler ---")
-    schedule = dp_scheduler_min_turnaround(random_jobs)
+    print("\n--- DP Scheduler (Min Turnaround Time) ---")
+    schedule, _ = dp_scheduler(random_jobs, objective='turnaround')
+    dp_plot_gantt(schedule)
 
-    print("\n--- Plotting Gantt Chart ---")
-    plot_gantt(schedule)
+    print("\n--- DP Scheduler (Min Response Time) ---")
+    schedule, _ = dp_scheduler(random_jobs, objective='response')
+    dp_plot_gantt(schedule)
+
+    print("\n--- DP Scheduler (Min Waiting Time) ---")
+    schedule, _ = dp_scheduler(random_jobs, objective='waiting')
+    dp_plot_gantt(schedule)
+
 
 
 '''

@@ -2,6 +2,8 @@ from schedlers.FCFS import FCFSScheduler
 from schedlers.MLFQ import MLFQScheduler
 from schedlers.SRTF import SRTFScheduler
 from schedlers.CFS import CFSScheduler
+from schedlers.DP_algs import dp_scheduler
+from schedlers.DP_sched_preemptive import preemptive_dp_scheduler
 
 from Job import Job
 
@@ -140,6 +142,36 @@ if __name__ == "__main__":
     CFS_results = calculate_metrics(CFS_scheduled_jobs, "CFS - TQ:4")
     results.append(CFS_results)
 
+    print("\n\nDP Scheduler metrics for TT")
+    DP_scheduled_sched, DP_scheduled_jobs = dp_scheduler(copy.deepcopy(jobs))
+    DP_results = calculate_metrics(DP_scheduled_jobs, "DP min Turnaround")
+    results.append(DP_results)
+
+    print("\n\nDP Scheduler metrics for Response Time")
+    DP_scheduled_sched, DP_scheduled_jobs = dp_scheduler(copy.deepcopy(jobs), objective='response')
+    DP_results = calculate_metrics(DP_scheduled_jobs, "DP min RT")
+    results.append(DP_results)
+
+    print("\n\nDP Scheduler metrics for Waiting Time")
+    DP_scheduled_sched, DP_scheduled_jobs = dp_scheduler(copy.deepcopy(jobs), objective='waiting')
+    DP_results = calculate_metrics(DP_scheduled_jobs, "DP min Waiting")
+    results.append(DP_results)
+
+    print("\n\nPreemptivenDP Scheduler metrics for TT")
+    DP_scheduled_sched, DP_scheduled_jobs = preemptive_dp_scheduler(copy.deepcopy(jobs))
+    DP_results = calculate_metrics(DP_scheduled_jobs, "nPreemptiveDP min Turnaround")
+    results.append(DP_results)
+
+    print("\n\nnPreemptiveDP Scheduler metrics for Response Time")
+    DP_scheduled_sched, DP_scheduled_jobs = preemptive_dp_scheduler(copy.deepcopy(jobs), objective='response')
+    DP_results = calculate_metrics(DP_scheduled_jobs, "nPreemptiveDP min RT")
+    results.append(DP_results)
+
+    print("\n\nPreemptive DP Scheduler metrics for Waiting Time")
+    DP_scheduled_sched, DP_scheduled_jobs = preemptive_dp_scheduler(copy.deepcopy(jobs), objective='waiting')
+    DP_results = calculate_metrics(DP_scheduled_jobs, "nPreemptiveDP min Waiting")
+    results.append(DP_results)
+
     #plot the results
-    plot_scheduler_comparison(results) 
+    #plot_scheduler_comparison(results) 
     plot_scheduler_comparison(results) 
